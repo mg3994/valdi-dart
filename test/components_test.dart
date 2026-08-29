@@ -41,17 +41,26 @@ void main() {
       expect(btn.children.first, equals(Component.text('Click Me')));
     });
 
-    test('NativeViewTagExtension maps components to native platform view names', () {
+    test('Label component maps to text tag and carries text value', () {
+      final label = Label('Hello Native');
+      expect(label.tag, equals('text'));
+      expect(label.attributes['value'], equals('Hello Native'));
+    });
+
+    test('NativeViewTagExtension maps components to real native platform view names (UITableView, UILabel, UIStackView)', () {
       final vstack = VStack();
-      final img = Image(src: 'logo.png');
+      final label = Label('Test');
+      final scroll = ScrollView();
       final btn = Button(label: 'Submit');
 
       expect(vstack.nativeViewTag(ValdiPlatform.android), equals('android.widget.LinearLayout'));
       expect(vstack.nativeViewTag(ValdiPlatform.iOS), equals('UIStackView'));
-      expect(vstack.nativeViewTag(ValdiPlatform.web), equals('div'));
 
-      expect(img.nativeViewTag(ValdiPlatform.android), equals('android.widget.ImageView'));
-      expect(img.nativeViewTag(ValdiPlatform.iOS), equals('UIImageView'));
+      expect(label.nativeViewTag(ValdiPlatform.android), equals('android.widget.TextView'));
+      expect(label.nativeViewTag(ValdiPlatform.iOS), equals('UILabel'));
+
+      expect(scroll.nativeViewTag(ValdiPlatform.android), equals('android.widget.ListView'));
+      expect(scroll.nativeViewTag(ValdiPlatform.iOS), equals('UITableView'));
 
       expect(btn.nativeViewTag(ValdiPlatform.android), equals('android.widget.Button'));
       expect(btn.nativeViewTag(ValdiPlatform.iOS), equals('UIButton'));

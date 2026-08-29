@@ -12,18 +12,22 @@ Map<String, String> _mergeAttributes(Map<String, String> base, Map<String, Strin
   return {...base, ...overrides};
 }
 
-/// Helper extension to get platform-specific native view tag names.
+/// Helper extension to map declarative Valdi components to real native platform views
+/// (e.g. UITableView, UILabel, UIStackView on iOS and android.widget.* on Android).
 extension NativeViewTagExtension on CustomDomComponent {
   String nativeViewTag(ValdiPlatform platform) {
     return switch ((tag, platform)) {
       ('div', ValdiPlatform.android) => 'android.widget.LinearLayout',
       ('div', ValdiPlatform.iOS) => 'UIStackView',
       ('div', ValdiPlatform.web) => 'div',
+      ('text', ValdiPlatform.android) => 'android.widget.TextView',
+      ('text', ValdiPlatform.iOS) => 'UILabel',
+      ('text', ValdiPlatform.web) => 'span',
       ('img', ValdiPlatform.android) => 'android.widget.ImageView',
       ('img', ValdiPlatform.iOS) => 'UIImageView',
       ('img', ValdiPlatform.web) => 'img',
-      ('scroll-view', ValdiPlatform.android) => 'android.widget.ScrollView',
-      ('scroll-view', ValdiPlatform.iOS) => 'UIScrollView',
+      ('scroll-view', ValdiPlatform.android) => 'android.widget.ListView',
+      ('scroll-view', ValdiPlatform.iOS) => 'UITableView',
       ('scroll-view', ValdiPlatform.web) => 'div',
       ('button', ValdiPlatform.android) => 'android.widget.Button',
       ('button', ValdiPlatform.iOS) => 'UIButton',
@@ -31,6 +35,20 @@ extension NativeViewTagExtension on CustomDomComponent {
       _ => tag,
     };
   }
+}
+
+/// Label text node component mapping to native UILabel / TextView.
+class Label extends CustomDomComponent<Map<String, String>, List<Component>> {
+  final String text;
+
+  Label(
+    this.text, {
+    Map<String, String>? attributes,
+  }) : super(
+          'text',
+          _mergeAttributes({'value': text}, attributes),
+          [Component.text(text)],
+        );
 }
 
 /// Flex layout component for vertical arrangement.
@@ -85,7 +103,7 @@ class Image extends CustomDomComponent<Map<String, String>, List<Component>> {
         );
 }
 
-/// ScrollView component wrapper around CustomDomComponent.
+/// ScrollView component mapping to native UITableView / android.widget.ListView.
 class ScrollView extends CustomDomComponent<Map<String, String>, List<Component>> {
   final FlexDirection direction;
 
