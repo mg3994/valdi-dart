@@ -3,6 +3,30 @@ import '../framework/framework.dart';
 /// Flex direction options for Valdi layouts.
 enum FlexDirection { column, row }
 
+/// Target native platform for view rendering mappings.
+enum ValdiPlatform { android, iOS, web }
+
+/// Helper extension to get platform-specific native view tag names.
+extension NativeViewTagExtension on CustomDomComponent {
+  String nativeViewTag(ValdiPlatform platform) {
+    return switch ((tag, platform)) {
+      ('div', ValdiPlatform.android) => 'android.widget.LinearLayout',
+      ('div', ValdiPlatform.iOS) => 'UIStackView',
+      ('div', ValdiPlatform.web) => 'div',
+      ('img', ValdiPlatform.android) => 'android.widget.ImageView',
+      ('img', ValdiPlatform.iOS) => 'UIImageView',
+      ('img', ValdiPlatform.web) => 'img',
+      ('scroll-view', ValdiPlatform.android) => 'android.widget.ScrollView',
+      ('scroll-view', ValdiPlatform.iOS) => 'UIScrollView',
+      ('scroll-view', ValdiPlatform.web) => 'div',
+      ('button', ValdiPlatform.android) => 'android.widget.Button',
+      ('button', ValdiPlatform.iOS) => 'UIButton',
+      ('button', ValdiPlatform.web) => 'button',
+      _ => tag,
+    };
+  }
+}
+
 /// Flex layout component for vertical arrangement.
 class VStack extends CustomDomComponent<Map<String, String>, List<Component>> {
   VStack({
@@ -95,4 +119,9 @@ class Button extends CustomDomComponent<Map<String, String>, List<Component>> {
             ...?children,
           ],
         );
+
+  /// Dispatches click interaction to callback handler.
+  void click() {
+    onClick?.call();
+  }
 }

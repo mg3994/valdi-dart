@@ -40,5 +40,21 @@ void main() {
       expect(btn.attributes['clickable'], equals('true'));
       expect(btn.children.first, equals(Component.text('Click Me')));
     });
+
+    test('NativeViewTagExtension maps components to native platform view names', () {
+      final vstack = VStack();
+      final img = Image(src: 'logo.png');
+      final btn = Button(label: 'Submit');
+
+      expect(vstack.nativeViewTag(ValdiPlatform.android), equals('android.widget.LinearLayout'));
+      expect(vstack.nativeViewTag(ValdiPlatform.iOS), equals('UIStackView'));
+      expect(vstack.nativeViewTag(ValdiPlatform.web), equals('div'));
+
+      expect(img.nativeViewTag(ValdiPlatform.android), equals('android.widget.ImageView'));
+      expect(img.nativeViewTag(ValdiPlatform.iOS), equals('UIImageView'));
+
+      expect(btn.nativeViewTag(ValdiPlatform.android), equals('android.widget.Button'));
+      expect(btn.nativeViewTag(ValdiPlatform.iOS), equals('UIButton'));
+    });
   });
 }

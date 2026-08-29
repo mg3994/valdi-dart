@@ -23,7 +23,7 @@ void main() {
   detailsRoute = AppRoute('/details', buildDetailsScreen);
   appRouter = AppRouter(initialRoute: homeRoute);
 
-  // Render initial route
+  // Render initial route across target native platforms
   printCurrentState();
 
   // Listen for navigation changes
@@ -101,4 +101,9 @@ void printCurrentState() {
   final componentTree = appRouter.buildCurrentComponent();
   print('Active Route: ${currentRoute.id}');
   print('Rendered Component Tree: $componentTree');
+  if (componentTree is CustomDomComponent) {
+    print('Native View Mapping (Android): ${componentTree.nativeViewTag(ValdiPlatform.android)}');
+    print('Native View Mapping (iOS): ${componentTree.nativeViewTag(ValdiPlatform.iOS)}');
+    print('Native View Mapping (Web): ${componentTree.nativeViewTag(ValdiPlatform.web)}');
+  }
 }
