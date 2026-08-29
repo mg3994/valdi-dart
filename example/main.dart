@@ -42,8 +42,8 @@ class CounterView extends SignalComponent {
       spacing: '16px',
       alignment: 'center',
       children: [
-        Component.text('Valdi Dart Counter Demo'),
-        Component.text('Current Count: $count'),
+        Component.text('Valdi Dart Native Framework Demo'),
+        Component.text('Current Counter Value: $count'),
         HStack(
           spacing: '8px',
           children: [
@@ -92,10 +92,11 @@ class DetailsView extends Component {
 }
 
 void main() async {
-  print('=== Valdi-Dart Framework Example App ===\n');
+  print('=== Valdi-Dart Native Multi-Platform Rendering Framework Demo ===\n');
 
   final counterCubit = CounterCubit();
   final router = AppRouter<AppRoute>(initialRoute: const HomeScreenRoute());
+  final renderDriver = DefaultNativeRenderDriver();
 
   // Register route mappings
   router.registerRoute<HomeScreenRoute>((route) {
@@ -110,14 +111,18 @@ void main() async {
 
   // Watch tree rendering & state changes
   Component currentTree = signalContext.watch((ctx) => router.buildCurrentTree());
-  print('Initial Render Tree at Home:');
-  _printComponentTree(currentTree, 0);
+
+  // Mount initial component tree to native view hierarchy (Android View / iOS UIView / Impeller)
+  final nativeViewTree = renderDriver.mount(currentTree);
+  print('Mounted Native View Hierarchy (Android/iOS/Flutter Native):');
+  print('  $nativeViewTree');
 
   signalContext.onReconcile = (mutations) {
-    print('\n[Reconciler] State update triggered sub-tree mutations:');
+    print('\n[Reconciler] Applying sub-tree mutations to Native Views:');
     for (final mutation in mutations) {
       print('  -> $mutation');
     }
+    renderDriver.applyMutations(nativeViewTree, mutations);
   };
 
   // 1. Mutate State
@@ -125,8 +130,8 @@ void main() async {
   counterCubit.increment();
 
   currentTree = router.buildCurrentTree();
-  print('\nUpdated Render Tree after Increment:');
-  _printComponentTree(currentTree, 0);
+  print('\nNative View Tree after Increment:');
+  print('  $nativeViewTree');
 
   // 2. Navigate to Details Screen
   print('\n---> Action: Navigating to Details Screen...');
@@ -148,7 +153,7 @@ void main() async {
   signalContext.dispose();
   counterCubit.close();
 
-  print('\n=== Example Application Executed Successfully! ===');
+  print('\n=== Valdi Native Framework Demo Executed Successfully! ===');
 }
 
 void _printComponentTree(Component component, int indentLevel) {
