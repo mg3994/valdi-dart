@@ -6,6 +6,12 @@ enum FlexDirection { column, row }
 /// Target native platform for view rendering mappings.
 enum ValdiPlatform { android, iOS, web }
 
+/// Helper function to cleanly merge base component attributes with user overrides (DRY principle).
+Map<String, String> _mergeAttributes(Map<String, String> base, Map<String, String>? overrides) {
+  if (overrides == null || overrides.isEmpty) return base;
+  return {...base, ...overrides};
+}
+
 /// Helper extension to get platform-specific native view tag names.
 extension NativeViewTagExtension on CustomDomComponent {
   String nativeViewTag(ValdiPlatform platform) {
@@ -34,11 +40,10 @@ class VStack extends CustomDomComponent<Map<String, String>, List<Component>> {
     Map<String, String>? attributes,
   }) : super(
           'div',
-          {
-            'display': 'flex',
-            'flex-direction': 'column',
-            ...?attributes,
-          },
+          _mergeAttributes(
+            {'display': 'flex', 'flex-direction': 'column'},
+            attributes,
+          ),
           children ?? const [],
         );
 }
@@ -50,11 +55,10 @@ class HStack extends CustomDomComponent<Map<String, String>, List<Component>> {
     Map<String, String>? attributes,
   }) : super(
           'div',
-          {
-            'display': 'flex',
-            'flex-direction': 'row',
-            ...?attributes,
-          },
+          _mergeAttributes(
+            {'display': 'flex', 'flex-direction': 'row'},
+            attributes,
+          ),
           children ?? const [],
         );
 }
@@ -70,11 +74,13 @@ class Image extends CustomDomComponent<Map<String, String>, List<Component>> {
     Map<String, String>? attributes,
   }) : super(
           'img',
-          {
-            'src': src,
-            if (alt != null) 'alt': alt,
-            ...?attributes,
-          },
+          _mergeAttributes(
+            {
+              'src': src,
+              if (alt != null) 'alt': alt,
+            },
+            attributes,
+          ),
           const [],
         );
 }
@@ -89,11 +95,13 @@ class ScrollView extends CustomDomComponent<Map<String, String>, List<Component>
     Map<String, String>? attributes,
   }) : super(
           'scroll-view',
-          {
-            'overflow': 'scroll',
-            'direction': direction.name,
-            ...?attributes,
-          },
+          _mergeAttributes(
+            {
+              'overflow': 'scroll',
+              'direction': direction.name,
+            },
+            attributes,
+          ),
           children ?? const [],
         );
 }
@@ -110,10 +118,12 @@ class Button extends CustomDomComponent<Map<String, String>, List<Component>> {
     Map<String, String>? attributes,
   }) : super(
           'button',
-          {
-            if (onClick != null) 'clickable': 'true',
-            ...?attributes,
-          },
+          _mergeAttributes(
+            {
+              if (onClick != null) 'clickable': 'true',
+            },
+            attributes,
+          ),
           [
             if (label != null) Component.text(label),
             ...?children,

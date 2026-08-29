@@ -70,25 +70,6 @@ final class MoveOp extends MutationOp {
   String toString() => 'MoveOp(from: $oldIndex, to: $newIndex)';
 }
 
-/// In-memory representation of a rendered node in the UI hierarchy.
-class RenderNode {
-  Component component;
-  final List<RenderNode> children;
-  final Map<String, String> attributes;
-  final String? tag;
-
-  RenderNode({
-    required this.component,
-    List<RenderNode>? children,
-    Map<String, String>? attributes,
-    this.tag,
-  })  : children = children ?? [],
-        attributes = attributes ?? {};
-
-  @override
-  String toString() => 'RenderNode(tag: $tag, component: $component, children: $children)';
-}
-
 /// Reconciler engine that performs diffing between component trees
 /// and generates minimal mutation operations.
 class Reconciler {
@@ -155,10 +136,16 @@ class Reconciler {
         );
         ops.addAll(childOps);
       default:
-        // Build components if custom composite components
-        final oldBuilt = _expandComponent(oldNode);
-        final newBuilt = _expandComponent(newNode);
-        return diff(oldBuilt, newBuilt, parentTag: parentTag);
+        // Different component types: replace node
+        if (oldNode.runtimeType != newNode.runtimeType) {
+          ops.add(DeleteOp(component: oldNode, index: 0));
+          ops.add(InsertOp(component: newNode, index: 0, parentTag: parentTag));
+        } else {
+          // Build custom composite components
+          final oldBuilt = _expandComponent(oldNode);
+          final newBuilt = _expandComponent(newNode);
+          return diff(oldBuilt, newBuilt, parentTag: parentTag);
+        }
     }
 
     return ops;
