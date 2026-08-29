@@ -1,0 +1,14 @@
+name: valdi_dart
+description: Snapchat's Valdi framework ported to pure Dart.
+version: 1.0.0
+environment:
+  sdk: '>=3.0.0 <4.0.0'
+
+dependencies:
+  collection: ^1.19.1
+  bloc_signals: ^1.1.0
+  kaisel_core: ^1.1.0
+
+dev_dependencies:
+  test: ^1.24.0
+  lints: ^3.0.0
